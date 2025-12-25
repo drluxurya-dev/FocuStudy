@@ -1,0 +1,98 @@
+{% extends 'base.html' %}
+
+{% block title %}Mes Cours - FocusStudy{% endblock %}
+
+{% block content %}
+<div class="flex justify-between items-center mb-8">
+    <div>
+        <h1 class="text-3xl font-bold mb-1" style="color: var(--text-primary);">Mes Cours</h1>
+        <p class="text-sm" style="color: var(--text-secondary);">{{ cours.count }} cours au total</p>
+    </div>
+
+    <a href="{% url 'courses:ajouter' %}" class="px-6 py-3 rounded-xl text-white font-medium transition hover:opacity-90" style="background: var(--accent);">
+        <i class="fas fa-plus mr-2"></i>Ajouter
+    </a>
+</div>
+
+<!-- Stats rapides -->
+<div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+    <div class="glass rounded-xl p-4 bento-card">
+        <div class="text-2xl font-bold mb-1" style="color: var(--accent);">{{ cours.count }}</div>
+        <div class="text-xs" style="color: var(--text-secondary);">Total</div>
+    </div>
+    <div class="glass rounded-xl p-4 bento-card">
+        <div class="text-2xl font-bold mb-1" style="color: var(--accent);">0</div>
+        <div class="text-xs" style="color: var(--text-secondary);">Ce mois</div>
+    </div>
+    <div class="glass rounded-xl p-4 bento-card">
+        <div class="text-2xl font-bold mb-1" style="color: var(--accent);">0</div>
+        <div class="text-xs" style="color: var(--text-secondary);">Révisions</div>
+    </div>
+    <div class="glass rounded-xl p-4 bento-card">
+        <div class="text-2xl font-bold mb-1" style="color: var(--accent);">0</div>
+        <div class="text-xs" style="color: var(--text-secondary);">Favoris</div>
+    </div>
+</div>
+
+<!-- Recherche -->
+<div class="glass rounded-xl p-4 mb-6">
+    <input
+        type="text"
+        placeholder="Rechercher un cours..."
+        class="w-full bg-transparent text-sm focus:outline-none"
+        style="color: var(--text-primary);"
+    >
+</div>
+
+<!-- Liste des cours -->
+{% if cours %}
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {% for c in cours %}
+        <a href="{% url 'courses:detail' c.id %}" class="glass rounded-xl p-5 bento-card block">
+            <div class="flex justify-between items-start mb-3">
+                <span class="text-xs font-medium px-3 py-1 rounded-full" style="background: var(--accent); opacity: 0.2; color: var(--accent);">
+                    {{ c.matiere.nom|default:"Autre" }}
+                </span>
+
+                {% if c.statut == 'traite' %}
+                    <i class="fas fa-check-circle text-green-500"></i>
+                {% elif c.statut == 'en_traitement' %}
+                    <i class="fas fa-spinner fa-spin" style="color: var(--accent);"></i>
+                {% endif %}
+            </div>
+
+            <h3 class="font-semibold mb-2 line-clamp-2" style="color: var(--text-primary);">
+                {{ c.titre }}
+            </h3>
+
+            {% if c.chapitre %}
+            <p class="text-xs mb-3" style="color: var(--text-secondary);">
+                {{ c.chapitre }}
+            </p>
+            {% endif %}
+
+            <div class="flex justify-between items-center pt-3" style="border-top: 1px solid var(--border-color);">
+                <span class="text-xs" style="color: var(--text-secondary);">
+                    {{ c.date_ajout|date:"d/m/Y" }}
+                </span>
+
+                {% if c.favori %}
+                    <i class="fas fa-star text-yellow-500"></i>
+                {% endif %}
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="glass rounded-2xl p-12 text-center">
+        <div class="text-6xl mb-4">📚</div>
+        <h2 class="text-xl font-bold mb-2" style="color: var(--text-primary);">Aucun cours</h2>
+        <p class="text-sm mb-6" style="color: var(--text-secondary);">
+            Commence par ajouter ton premier cours
+        </p>
+        <a href="{% url 'courses:ajouter' %}" class="inline-block px-6 py-3 rounded-xl text-white font-medium transition hover:opacity-90" style="background: var(--accent);">
+            <i class="fas fa-plus mr-2"></i>Ajouter un cours
+        </a>
+    </div>
+{% endif %}
+{% endblock %}

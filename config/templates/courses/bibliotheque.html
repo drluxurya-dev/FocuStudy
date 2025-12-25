@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+
+{% block title %}Bibliothèque de Cours - FocusStudy{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto">
+    <!-- En-tête -->
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold mb-2" style="color: var(--text-primary);">📚 Bibliothèque de Cours</h1>
+        <p class="text-sm mb-4" style="color: var(--text-secondary);">
+            Cours générés automatiquement selon le programme de {{ user.get_classe_display }} - {{ user.get_pays_display }}
+        </p>
+
+        <form method="post" action="{% url 'courses:generer_tous' %}" class="inline">
+            {% csrf_token %}
+            <button type="submit" class="px-6 py-3 rounded-xl text-white font-medium transition hover:opacity-90" style="background: var(--accent);">
+                <i class="fas fa-magic mr-2"></i>Générer tous les cours
+            </button>
+        </form>
+    </div>
+
+    <!-- Statistiques -->
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        <div class="glass rounded-xl p-4 text-center">
+            <div class="text-2xl font-bold mb-1" style="color: var(--accent);">{{ matieres_data|length }}</div>
+            <div class="text-xs" style="color: var(--text-secondary);">Matières</div>
+        </div>
+        <div class="glass rounded-xl p-4 text-center">
+            <div class="text-2xl font-bold mb-1" style="color: var(--accent);">
+                {% for m in matieres_data %}{{ m.total_chapitres }}{% if not forloop.last %}+{% endif %}{% endfor %}
+            </div>
+            <div class="text-xs" style="color: var(--text-secondary);">Chapitres</div>
+        </div>
+        <div class="glass rounded-xl p-4 text-center">
+            <div class="text-2xl font-bold mb-1" style="color: var(--accent);">
+                {% for m in matieres_data %}{{ m.cours_generes }}{% if not forloop.last %}+{% endif %}{% endfor %}
+            </div>
+            <div class="text-xs" style="color: var(--text-secondary);">Générés</div>
+        </div>
+        <div class="glass rounded-xl p-4 text-center">
+            <div class="text-2xl font-bold mb-1" style="color: var(--accent);">100%</div>
+            <div class="text-xs" style="color: var(--text-secondary);">Gratuit</div>
+        </div>
+    </div>
+
+    <!-- Liste des matières -->
+    {% for data in matieres_data %}
+    <div class="glass rounded-2xl p-6 mb-6">
+        <div class="flex justify-between items-center mb-4">
+            <div class="flex items-center gap-3">
+                <div class="text-3xl">{{ data.matiere.icone }}</div>
+                <div>
+                    <h2 class="text-xl font-bold" style="color: var(--text-primary);">{{ data.matiere.nom }}</h2>
+                    <p class="text-sm" style="color: var(--text-secondary);">
+                        {{ data.cours_generes }} / {{ data.total_chapitres }} cours générés
+                    </p>
+                </div>
+            </div>
+
+            <form method="post" action="{% url 'courses:generer_matiere' data.matiere.id %}">
+                {% csrf_token %}
+                <button type="submit" class="px-4 py-2 rounded-lg text-sm font-medium transition hover:opacity-70" style="background: var(--accent); opacity: 0.2; color: var(--accent);">
+                    <i class="fas fa-plus mr-1"></i>Générer tout
+                </button>
+            </form>
+        </div>
+
+        <!-- Barre de progression -->
+        <div class="w-full h-2 rounded-full mb-6" style="background: var(--bg-secondary);">
+            <div class="h-full rounded-full transition-all duration-500"
+                 style="background: var(--accent); width: {% widthratio data.cours_generes data.total_chapitres 100 %}%;">
+            </div>
+        </div>
+
+        <!-- Liste des chapitres -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {% for prog in data.programmes %}
+            <div class="glass rounded-xl p-4 flex justify-between items-center">
+                <div class="flex-1">
+                    <h3 class="font-medium text-sm mb-1" style="color: var(--text-primary);">{{ prog.titre }}</h3>
+                    <p class="text-xs" style="color: var(--text-secondary);">Chapitre {{ prog.ordre|add:1 }}</p>
+                </div>
+
+                {% if prog.cours_generes.exists %}
+                    <a href="{% url 'courses:detail' prog.cours_generes.first.cours.id %}" class="px-3 py-1 rounded-lg text-xs font-medium bg-green-500 bg-opacity-20 text-green-500">
+                        <i class="fas fa-check mr-1"></i>Voir
+                    </a>
+                {% else %}
+                    <form method="post" action="{% url 'courses:generer_auto' prog.id %}">
+                        {% csrf_token %}
+                        <button type="submit" class="px-3 py-1 rounded-lg text-xs font-medium transition hover:opacity-70" style="background: var(--accent); opacity: 0.2; color: var(--accent);">
+                            <i class="fas fa-plus mr-1"></i>Générer
+                        </button>
+                    </form>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% empty %}
+    <div class="glass rounded-2xl p-12 text-center">
+        <div class="text-6xl mb-4">🤖</div>
+        <h2 class="text-xl font-bold mb-2" style="color: var(--text-primary);">Programme en cours de chargement</h2>
+        <p class="text-sm mb-6" style="color: var(--text-secondary);">
+            L'IA analyse le programme scolaire de ta classe...
+        </p>
+        <button onclick="window.location.reload()" class="px-6 py-3 rounded-xl text-white font-medium transition hover:opacity-90" style="background: var(--accent);">
+            <i class="fas fa-sync mr-2"></i>Actualiser
+        </button>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}

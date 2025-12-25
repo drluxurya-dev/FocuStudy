@@ -1,0 +1,184 @@
+{% extends 'base.html' %}
+
+{% block title %}Compléter mon profil - FocusStudy{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto">
+    <div class="glass rounded-2xl p-8">
+        <div class="text-center mb-8">
+            <div class="w-16 h-16 rounded-2xl mx-auto flex items-center justify-center mb-4" style="background: var(--accent); opacity: 0.1;">
+                <i class="fas fa-user-circle text-3xl" style="color: var(--accent);"></i>
+            </div>
+            <h1 class="text-3xl font-bold mb-2" style="color: var(--text-primary);">Bienvenue {{ user.first_name }} !</h1>
+            <p class="text-sm" style="color: var(--text-secondary);">Complète ton profil pour une expérience personnalisée</p>
+        </div>
+
+        <form method="post" enctype="multipart/form-data" class="space-y-5">
+            {% csrf_token %}
+
+            <div class="text-center mb-6">
+                <label class="block text-sm font-medium mb-3" style="color: var(--text-primary);">Photo de profil</label>
+                <div class="flex justify-center">
+                    <div class="relative">
+                        <img id="preview" src="https://via.placeholder.com/120" alt="Aperçu" class="w-28 h-28 rounded-2xl object-cover" style="border: 2px solid var(--border-color);">
+                        <label for="photo_profil" class="absolute -bottom-2 -right-2 w-10 h-10 rounded-xl flex items-center justify-center cursor-pointer transition hover:opacity-80" style="background: var(--accent);">
+                            <i class="fas fa-camera text-white"></i>
+                        </label>
+                        <input type="file" id="photo_profil" name="photo_profil" accept="image/*" class="hidden" onchange="previewImage(event)">
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium mb-2" style="color: var(--text-primary);">Niveau scolaire *</label>
+                    <select
+                        name="niveau"
+                        required
+                        id="niveau"
+                        class="glass w-full px-4 py-3 rounded-xl text-sm focus:outline-none focus:ring-2 transition"
+                        style="color: var(--text-primary); --tw-ring-color: var(--accent);"
+                        onchange="updateClasses()"
+                    >
+                        <option value="">Choisir</option>
+                        <option value="college">Collège</option>
+                        <option value="lycee">Lycée</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium mb-2" style="color: var(--text-primary);">Classe *</label>
+                    <select
+                        name="classe"
+                        required
+                        id="classe"
+                        class="glass w-full px-4 py-3 rounded-xl text-sm focus:outline-none focus:ring-2 transition"
+                        style="color: var(--text-primary); --tw-ring-color: var(--accent);"
+                        onchange="updateSerie()"
+                    >
+                        <option value="">Choisir le niveau d'abord</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="serie-container" class="hidden">
+                <label class="block text-sm font-medium mb-2" style="color: var(--text-primary);">Série *</label>
+                <select
+                    name="serie"
+                    id="serie"
+                    class="glass w-full px-4 py-3 rounded-xl text-sm focus:outline-none focus:ring-2 transition"
+                    style="color: var(--text-primary); --tw-ring-color: var(--accent);"
+                >
+                    <option value="">Choisir une série</option>
+                    <option value="A">Série A (Littéraire)</option>
+                    <option value="C">Série C (Scientifique)</option>
+                    <option value="D">Série D (Sciences expérimentales)</option>
+                    <option value="E">Série E (Mathématiques et Techniques)</option>
+                    <option value="G">Série G (Techniques administratives)</option>
+                    <option value="F">Série F (Techniques industrielles)</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium mb-2" style="color: var(--text-primary);">Pays *</label>
+                <select
+                    name="pays"
+                    required
+                    class="glass w-full px-4 py-3 rounded-xl text-sm focus:outline-none focus:ring-2 transition"
+                    style="color: var(--text-primary); --tw-ring-color: var(--accent);"
+                >
+                    <option value="">Choisir</option>
+                    <option value="TG">🇹🇬 Togo</option>
+                    <option value="BJ">🇧🇯 Bénin</option>
+                    <option value="SN">🇸🇳 Sénégal</option>
+                    <option value="CI">🇨🇮 Côte d'Ivoire</option>
+                    <option value="BF">🇧🇫 Burkina Faso</option>
+                    <option value="ML">🇲🇱 Mali</option>
+                    <option value="NE">🇳🇪 Niger</option>
+                    <option value="GN">🇬🇳 Guinée</option>
+                </select>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium mb-2" style="color: var(--text-primary);">Téléphone</label>
+                <input
+                    type="tel"
+                    name="telephone"
+                    class="glass w-full px-4 py-3 rounded-xl text-sm focus:outline-none focus:ring-2 transition"
+                    style="color: var(--text-primary); --tw-ring-color: var(--accent);"
+                    placeholder="+228 XX XX XX XX"
+                >
+            </div>
+
+            <div class="flex gap-3">
+                <button
+                    type="submit"
+                    class="flex-1 py-3 rounded-xl text-white font-medium transition hover:opacity-90"
+                    style="background: var(--accent);"
+                >
+                    Terminer
+                </button>
+
+                <a href="{% url 'home' %}" class="glass px-6 py-3 rounded-xl text-sm font-medium transition hover:opacity-80" style="color: var(--text-primary);">
+                    Passer
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function previewImage(event) {
+        const preview = document.getElementById('preview');
+        const file = event.target.files[0];
+
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                preview.src = e.target.result;
+            }
+            reader.readAsDataURL(file);
+        }
+    }
+
+    function updateClasses() {
+        const niveau = document.getElementById('niveau').value;
+        const classeSelect = document.getElementById('classe');
+
+        classeSelect.innerHTML = '<option value="">Choisir</option>';
+
+        if (niveau === 'college') {
+            classeSelect.innerHTML += `
+                <option value="6eme">6ème</option>
+                <option value="5eme">5ème</option>
+                <option value="4eme">4ème</option>
+                <option value="3eme">3ème</option>
+            `;
+        } else if (niveau === 'lycee') {
+            classeSelect.innerHTML += `
+                <option value="seconde">Seconde</option>
+                <option value="premiere">Première</option>
+                <option value="terminale">Terminale</option>
+            `;
+        }
+
+        updateSerie();
+    }
+
+    function updateSerie() {
+        const niveau = document.getElementById('niveau').value;
+        const classe = document.getElementById('classe').value;
+        const serieContainer = document.getElementById('serie-container');
+        const serieSelect = document.getElementById('serie');
+
+        if (niveau === 'lycee' && (classe === 'premiere' || classe === 'terminale')) {
+            serieContainer.classList.remove('hidden');
+            serieSelect.setAttribute('required', 'required');
+        } else {
+            serieContainer.classList.add('hidden');
+            serieSelect.removeAttribute('required');
+            serieSelect.value = '';
+        }
+    }
+</script>
+{% endblock %}

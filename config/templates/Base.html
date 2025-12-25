@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="fr" class="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}FocusStudy{% endblock %}</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* Variables de couleurs */
+        :root {
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8f9fa;
+            --bg-glass: rgba(255, 255, 255, 0.7);
+            --text-primary: #1a1a1a;
+            --text-secondary: #6b7280;
+            --border-color: rgba(0, 0, 0, 0.1);
+            --accent: #8b5cf6;
+            --accent-light: #a78bfa;
+        }
+
+        .dark {
+            --bg-primary: #0f0f0f;
+            --bg-secondary: #1a1a1a;
+            --bg-glass: rgba(26, 26, 26, 0.7);
+            --text-primary: #f5f5f5;
+            --text-secondary: #a0a0a0;
+            --border-color: rgba(255, 255, 255, 0.1);
+            --accent: #8b5cf6;
+            --accent-light: #a78bfa;
+        }
+
+        body {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+
+        /* Glass effect */
+        .glass {
+            background: var(--bg-glass);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--border-color);
+        }
+
+        /* Bento box hover effect */
+        .bento-card {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .bento-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(139, 92, 246, 0.15);
+        }
+
+        /* Smooth transitions */
+        * {
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-secondary);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--accent);
+            border-radius: 4px;
+        }
+    </style>
+
+    {% block extra_css %}{% endblock %}
+</head>
+<body style="background: var(--bg-primary);">
+
+    <!-- Navigation -->
+    <nav class="glass sticky top-0 z-50" style="border-bottom: 1px solid var(--border-color);">
+        <div class="container mx-auto px-4 lg:px-8">
+            <div class="flex justify-between items-center py-4">
+                <!-- Logo -->
+                <a href="{% url 'home' %}" class="text-xl font-semibold flex items-center gap-2" style="color: var(--text-primary);">
+                    <div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background: var(--accent);">
+                        <i class="fas fa-graduation-cap text-white"></i>
+                    </div>
+                    FocusStudy
+                </a>
+
+                <!-- Menu Desktop -->
+                <div class="hidden md:flex items-center gap-6">
+                    {% if user.is_authenticated %}
+                        <a href="{% url 'courses:bibliotheque' %}" class="text-sm font-medium hover:opacity-70 transition" style="color: var(--text-secondary);">
+                            Bibliothèque
+                        </a>
+                        <a href="{% url 'courses:liste' %}" class="text-sm font-medium hover:opacity-70 transition" style="color: var(--text-secondary);">
+                            Mes Cours
+                        </a>
+                        <a href="{% url 'courses:aide_devoirs' %}" class="text-sm font-medium hover:opacity-70 transition" style="color: var(--text-secondary);">
+                            Aide Devoirs
+                        </a>
+                        <a href="{% url 'accounts:profil' %}" class="text-sm font-medium hover:opacity-70 transition" style="color: var(--text-secondary);">
+                            Profil
+                        </a>
+
+                        <!-- Theme Toggle -->
+                        <button onclick="toggleTheme()" class="p-2 rounded-lg hover:bg-opacity-80 transition" style="background: var(--bg-secondary);">
+                            <i class="fas fa-moon dark-icon hidden" style="color: var(--text-primary);"></i>
+                            <i class="fas fa-sun light-icon" style="color: var(--text-primary);"></i>
+                        </button>
+
+                        <a href="{% url 'accounts:logout' %}" class="px-4 py-2 rounded-lg text-sm font-medium transition" style="background: var(--bg-secondary); color: var(--text-primary);">
+                            Déconnexion
+                        </a>
+                    {% else %}
+                        <a href="{% url 'accounts:login' %}" class="text-sm font-medium hover:opacity-70 transition" style="color: var(--text-secondary);">
+                            Connexion
+                        </a>
+
+                        <!-- Theme Toggle -->
+                        <button onclick="toggleTheme()" class="p-2 rounded-lg hover:bg-opacity-80 transition" style="background: var(--bg-secondary);">
+                            <i class="fas fa-moon dark-icon hidden" style="color: var(--text-primary);"></i>
+                            <i class="fas fa-sun light-icon" style="color: var(--text-primary);"></i>
+                        </button>
+
+                        <a href="{% url 'accounts:signup' %}" class="px-4 py-2 rounded-lg text-sm font-medium text-white transition" style="background: var(--accent);">
+                            Inscription
+                        </a>
+                    {% endif %}
+                </div>
+
+                <!-- Menu Mobile Button -->
+                <button class="md:hidden p-2" id="mobile-menu-btn" style="color: var(--text-primary);">
+                    <i class="fas fa-bars text-xl"></i>
+                </button>
+            </div>
+
+            <!-- Menu Mobile -->
+            <div class="md:hidden hidden pb-4" id="mobile-menu">
+                {% if user.is_authenticated %}
+                    <a href="{% url 'courses:liste' %}" class="block py-2 text-sm" style="color: var(--text-secondary);">Mes Cours</a>
+                    <a href="{% url 'courses:ajouter' %}" class="block py-2 text-sm" style="color: var(--text-secondary);">Ajouter</a>
+                    <a href="{% url 'accounts:profil' %}" class="block py-2 text-sm" style="color: var(--text-secondary);">Profil</a>
+                    <a href="{% url 'accounts:logout' %}" class="block py-2 text-sm" style="color: var(--text-secondary);">Déconnexion</a>
+                {% else %}
+                    <a href="{% url 'accounts:login' %}" class="block py-2 text-sm" style="color: var(--text-secondary);">Connexion</a>
+                    <a href="{% url 'accounts:signup' %}" class="block py-2 text-sm" style="color: var(--text-secondary);">Inscription</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <!-- Messages -->
+    {% if messages %}
+        <div class="container mx-auto px-4 lg:px-8 mt-4">
+            {% for message in messages %}
+                <div class="glass rounded-xl p-4 mb-3" style="border-left: 3px solid var(--accent);">
+                    <p class="text-sm" style="color: var(--text-primary);">{{ message }}</p>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <!-- Main Content -->
+    <main class="container mx-auto px-4 lg:px-8 py-8">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="mt-20 py-8" style="background: var(--bg-secondary); border-top: 1px solid var(--border-color);">
+        <div class="container mx-auto px-4 lg:px-8">
+            <div class="text-center">
+                <p class="text-sm" style="color: var(--text-secondary);">
+                    © 2024 FocusStudy. Conçu pour les élèves d'Afrique de l'Ouest.
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Theme Toggle Script -->
+    <script>
+        // Vérifier le thème sauvegardé
+        const currentTheme = localStorage.getItem('theme') || 'light';
+        document.documentElement.className = currentTheme;
+        updateThemeIcons();
+
+        function toggleTheme() {
+            const html = document.documentElement;
+            const newTheme = html.className === 'light' ? 'dark' : 'light';
+            html.className = newTheme;
+            localStorage.setItem('theme', newTheme);
+            updateThemeIcons();
+        }
+
+        function updateThemeIcons() {
+            const isDark = document.documentElement.className === 'dark';
+            document.querySelectorAll('.dark-icon').forEach(el => {
+                el.classList.toggle('hidden', !isDark);
+            });
+            document.querySelectorAll('.light-icon').forEach(el => {
+                el.classList.toggle('hidden', isDark);
+            });
+        }
+
+        // Menu mobile
+        document.getElementById('mobile-menu-btn').addEventListener('click', function() {
+            const menu = document.getElementById('mobile-menu');
+            menu.classList.toggle('hidden');
+        });
+    </script>
+
+    {% block extra_js %}{% endblock %}
+</body>
+</html>

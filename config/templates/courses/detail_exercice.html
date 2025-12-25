@@ -1,0 +1,133 @@
+{% extends 'base.html' %}
+
+{% block title %}Ajouter un Exercice - FocusStudy{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto">
+    <div class="glass rounded-2xl p-8">
+        <div class="text-center mb-8">
+            <div class="w-16 h-16 rounded-2xl mx-auto flex items-center justify-center mb-4" style="background: var(--accent); opacity: 0.1;">
+                <i class="fas fa-question-circle text-3xl" style="color: var(--accent);"></i>
+            </div>
+            <h1 class="text-3xl font-bold mb-2" style="color: var(--text-primary);">Besoin d'aide ?</h1>
+            <p class="text-sm" style="color: var(--text-secondary);">Décris ton exercice, l'IA va t'aider à le résoudre</p>
+        </div>
+
+        <form method="post" enctype="multipart/form-data" class="space-y-5">
+            {% csrf_token %}
+
+            <div>
+                <label class="block text-sm font-medium mb-2" style="color: var(--text-primary);">Titre / Sujet *</label>
+                <input 
+                    type="text" 
+                    name="titre" 
+                    required
+                    placeholder="Ex: Équation du second degré"
+                    class="glass w-full px-4 py-3 rounded-xl text-sm focus:outline-none focus:ring-2 transition"
+                    style="color: var(--text-primary); --tw-ring-color: var(--accent);"
+                >
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium mb-2" style="color: var(--text-primary);">Type</label>
+                    <select 
+                        name="type_exercice"
+                        class="glass w-full px-4 py-3 rounded-xl text-sm focus:outline-none focus:ring-2 transition"
+                        style="color: var(--text-primary); --tw-ring-color: var(--accent);"
+                    >
+                        <option value="maths">Mathématiques</option>
+                        <option value="physique">Physique-Chimie</option>
+                        <option value="francais">Français</option>
+                        <option value="autres">Autres</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium mb-2" style="color: var(--text-primary);">Matière</label>
+                    <select 
+                        name="matiere"
+                        class="glass w-full px-4 py-3 rounded-xl text-sm focus:outline-none focus:ring-2 transition"
+                        style="color: var(--text-primary); --tw-ring-color: var(--accent);"
+                    >
+                        <option value="">Choisir</option>
+                        {% for matiere in matieres %}
+                            <option value="{{ matiere.id }}">{{ matiere.icone }} {{ matiere.nom }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium mb-2" style="color: var(--text-primary);">Énoncé de l'exercice *</label>
+                <textarea 
+                    name="enonce" 
+                    rows="8"
+                    required
+                    placeholder="Décris l'exercice en détail..."
+                    class="glass w-full px-4 py-3 rounded-xl text-sm focus:outline-none focus:ring-2 transition resize-none"
+                    style="color: var(--text-primary); --tw-ring-color: var(--accent);"
+                ></textarea>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium mb-2" style="color: var(--text-primary);">
+                    <i class="fas fa-camera mr-1"></i> Photo de l'exercice (optionnel)
+                </label>
+                <div class="glass rounded-xl p-6 text-center" style="border: 2px dashed var(--border-color);">
+                    <input type="file" name="photo_exercice" id="photo_exercice" accept="image/*" class="hidden" onchange="previewPhoto(event)">
+                    <label for="photo_exercice" class="cursor-pointer">
+                        <div id="photo-preview">
+                            <i class="fas fa-image text-4xl mb-2" style="color: var(--text-secondary);"></i>
+                            <p class="text-sm" style="color: var(--text-primary);">Ajouter une photo</p>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium mb-2" style="color: var(--text-primary);">Ta tentative de résolution (optionnel)</label>
+                <textarea 
+                    name="tentative_eleve" 
+                    rows="6"
+                    placeholder="Si tu as commencé à résoudre l'exercice, partage ta démarche ici..."
+                    class="glass w-full px-4 py-3 rounded-xl text-sm focus:outline-none focus:ring-2 transition resize-none"
+                    style="color: var(--text-primary); --tw-ring-color: var(--accent);"
+                ></textarea>
+                <p class="text-xs mt-2" style="color: var(--text-secondary);">
+                    <i class="fas fa-lightbulb mr-1"></i>L'IA pourra mieux t'aider si tu montres ta démarche
+                </p>
+            </div>
+
+            <div class="flex gap-3">
+                <button 
+                    type="submit" 
+                    class="flex-1 py-3 rounded-xl text-white font-medium transition hover:opacity-90"
+                    style="background: var(--accent);"
+                >
+                    <i class="fas fa-magic mr-2"></i>Obtenir de l'aide
+                </button>
+                
+                <a href="{% url 'courses:aide_devoirs' %}" class="glass px-6 py-3 rounded-xl font-medium transition hover:opacity-80" style="color: var(--text-primary);">
+                    Annuler
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function previewPhoto(event) {
+        const preview = document.getElementById('photo-preview');
+        const file = event.target.files[0];
+        
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                preview.innerHTML = `<img src="${e.target.result}" class="max-h-64 mx-auto rounded-xl">`;
+            }
+            reader.readAsDataURL(file);
+        }
+    }
+</script>
+{% endblock %}

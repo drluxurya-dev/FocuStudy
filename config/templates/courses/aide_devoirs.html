@@ -1,0 +1,89 @@
+{% extends 'base.html' %}
+
+{% block title %}Aide aux Devoirs - FocusStudy{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto">
+    <!-- En-tête -->
+    <div class="flex justify-between items-center mb-8">
+        <div>
+            <h1 class="text-3xl font-bold mb-1" style="color: var(--text-primary);">🤝 Aide aux Devoirs</h1>
+            <p class="text-sm" style="color: var(--text-secondary);">Pose tes questions, l'IA t'aide étape par étape</p>
+        </div>
+        
+        <a href="{% url 'courses:ajouter_exercice' %}" class="px-6 py-3 rounded-xl text-white font-medium transition hover:opacity-90" style="background: var(--accent);">
+            <i class="fas fa-plus mr-2"></i>Nouveau
+        </a>
+    </div>
+
+    <!-- Statistiques -->
+    <div class="grid grid-cols-3 gap-4 mb-8">
+        <div class="glass rounded-xl p-4 text-center">
+            <div class="text-2xl font-bold mb-1" style="color: var(--accent);">{{ stats.total }}</div>
+            <div class="text-xs" style="color: var(--text-secondary);">Total</div>
+        </div>
+        <div class="glass rounded-xl p-4 text-center">
+            <div class="text-2xl font-bold mb-1 text-green-500">{{ stats.resolus }}</div>
+            <div class="text-xs" style="color: var(--text-secondary);">Résolus</div>
+        </div>
+        <div class="glass rounded-xl p-4 text-center">
+            <div class="text-2xl font-bold mb-1" style="color: var(--accent);">{{ stats.en_attente }}</div>
+            <div class="text-xs" style="color: var(--text-secondary);">En attente</div>
+        </div>
+    </div>
+
+    <!-- Liste des exercices -->
+    {% if exercices %}
+        <div class="space-y-4">
+            {% for ex in exercices %}
+            <a href="{% url 'courses:detail_exercice' ex.id %}" class="glass rounded-xl p-5 flex justify-between items-start bento-card block">
+                <div class="flex-1">
+                    <div class="flex items-center gap-2 mb-2">
+                        <span class="text-xs font-medium px-3 py-1 rounded-full" style="background: var(--accent); opacity: 0.2; color: var(--accent);">
+                            {{ ex.matiere.nom|default:ex.get_type_exercice_display }}
+                        </span>
+                        
+                        {% if ex.statut == 'resolu' %}
+                            <span class="text-xs font-medium px-3 py-1 rounded-full bg-green-500 bg-opacity-20 text-green-500">
+                                <i class="fas fa-check-circle mr-1"></i>Résolu
+                            </span>
+                        {% elif ex.statut == 'en_cours' %}
+                            <span class="text-xs font-medium px-3 py-1 rounded-full" style="background: var(--accent); opacity: 0.2; color: var(--accent);">
+                                <i class="fas fa-spinner fa-spin mr-1"></i>En cours
+                            </span>
+                        {% endif %}
+                        
+                        {% if ex.utile %}
+                            <i class="fas fa-thumbs-up text-green-500"></i>
+                        {% endif %}
+                    </div>
+                    
+                    <h3 class="font-semibold mb-1" style="color: var(--text-primary);">{{ ex.titre }}</h3>
+                    <p class="text-sm line-clamp-2" style="color: var(--text-secondary);">{{ ex.enonce }}</p>
+                    
+                    <div class="flex items-center gap-4 mt-3 text-xs" style="color: var(--text-secondary);">
+                        <span><i class="far fa-calendar mr-1"></i>{{ ex.date_ajout|date:"d/m/Y" }}</span>
+                        {% if ex.date_resolution %}
+                            <span><i class="fas fa-check mr-1"></i>Résolu le {{ ex.date_resolution|date:"d/m/Y" }}</span>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <i class="fas fa-chevron-right" style="color: var(--text-secondary);"></i>
+            </a>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="glass rounded-2xl p-12 text-center">
+            <div class="text-6xl mb-4">📝</div>
+            <h2 class="text-xl font-bold mb-2" style="color: var(--text-primary);">Aucun exercice</h2>
+            <p class="text-sm mb-6" style="color: var(--text-secondary);">
+                Ajoute un exercice et obtiens de l'aide personnalisée de l'IA
+            </p>
+            <a href="{% url 'courses:ajouter_exercice' %}" class="inline-block px-6 py-3 rounded-xl text-white font-medium transition hover:opacity-90" style="background: var(--accent);">
+                <i class="fas fa-plus mr-2"></i>Ajouter un exercice
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

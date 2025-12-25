@@ -1,0 +1,116 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<!-- Hero Section -->
+<div class="max-w-4xl mx-auto text-center mb-16">
+    <h1 class="text-5xl md:text-6xl font-bold mb-6" style="color: var(--text-primary);">
+        Apprends intelligemment
+    </h1>
+    <p class="text-xl mb-8" style="color: var(--text-secondary);">
+        Transforme tes cours en supports de révision avec l'intelligence artificielle
+    </p>
+
+    {% if not user.is_authenticated %}
+        <div class="flex flex-col sm:flex-row gap-4 justify-center">
+            <a href="{% url 'accounts:signup' %}" class="px-8 py-4 rounded-xl text-white font-medium transition hover:opacity-90" style="background: var(--accent);">
+                Commencer gratuitement
+            </a>
+            <a href="{% url 'accounts:login' %}" class="glass px-8 py-4 rounded-xl font-medium transition hover:opacity-90" style="color: var(--text-primary);">
+                Se connecter
+            </a>
+        </div>
+    {% endif %}
+</div>
+
+<!-- Bento Grid -->
+<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-16">
+    <!-- Card 1 -->
+    <div class="glass rounded-2xl p-6 bento-card">
+        <div class="w-12 h-12 rounded-xl flex items-center justify-center mb-4" style="background: var(--accent); opacity: 0.1;">
+            <i class="fas fa-camera text-2xl" style="color: var(--accent);"></i>
+        </div>
+        <h3 class="text-lg font-semibold mb-2" style="color: var(--text-primary);">Photo instantanée</h3>
+        <p class="text-sm" style="color: var(--text-secondary);">Prends une photo de ton cahier et laisse l'IA organiser le contenu</p>
+    </div>
+
+    <!-- Card 2 -->
+    <div class="glass rounded-2xl p-6 bento-card">
+        <div class="w-12 h-12 rounded-xl flex items-center justify-center mb-4" style="background: var(--accent); opacity: 0.1;">
+            <i class="fas fa-robot text-2xl" style="color: var(--accent);"></i>
+        </div>
+        <h3 class="text-lg font-semibold mb-2" style="color: var(--text-primary);">IA intelligente</h3>
+        <p class="text-sm" style="color: var(--text-secondary);">Génération automatique de résumés et fiches de révision</p>
+    </div>
+
+    <!-- Card 3 -->
+    <div class="glass rounded-2xl p-6 bento-card">
+        <div class="w-12 h-12 rounded-xl flex items-center justify-center mb-4" style="background: var(--accent); opacity: 0.1;">
+            <i class="fas fa-question-circle text-2xl" style="color: var(--accent);"></i>
+        </div>
+        <h3 class="text-lg font-semibold mb-2" style="color: var(--text-primary);">Quiz adaptatifs</h3>
+        <p class="text-sm" style="color: var(--text-secondary);">Questions personnalisées selon ton niveau et tes lacunes</p>
+    </div>
+
+    <!-- Card 4 - Large -->
+    <div class="glass rounded-2xl p-6 bento-card md:col-span-2">
+        <div class="flex items-start gap-4">
+            <div class="w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0" style="background: var(--accent); opacity: 0.1;">
+                <i class="fas fa-chart-line text-2xl" style="color: var(--accent);"></i>
+            </div>
+            <div>
+                <h3 class="text-lg font-semibold mb-2" style="color: var(--text-primary);">Suivi personnalisé</h3>
+                <p class="text-sm" style="color: var(--text-secondary);">Statistiques détaillées de ta progression et recommandations intelligentes pour améliorer tes résultats</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Card 5 -->
+    <div class="glass rounded-2xl p-6 bento-card">
+        <div class="w-12 h-12 rounded-xl flex items-center justify-center mb-4" style="background: var(--accent); opacity: 0.1;">
+            <i class="fas fa-globe-africa text-2xl" style="color: var(--accent);"></i>
+        </div>
+        <h3 class="text-lg font-semibold mb-2" style="color: var(--text-primary);">Adapté localement</h3>
+        <p class="text-sm" style="color: var(--text-secondary);">Programmes scolaires d'Afrique de l'Ouest</p>
+    </div>
+</div>
+
+<!-- Stats pour utilisateurs connectés -->
+{% if user.is_authenticated %}
+<div class="glass rounded-2xl p-8 mb-16">
+    <h2 class="text-2xl font-bold mb-6" style="color: var(--text-primary);">Ton activité</h2>
+
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div class="text-center">
+            <div class="text-4xl font-bold mb-1" style="color: var(--accent);">{{ stats.total_cours }}</div>
+            <div class="text-sm" style="color: var(--text-secondary);">Cours</div>
+        </div>
+
+        <div class="text-center">
+            <div class="text-4xl font-bold mb-1" style="color: var(--accent);">{{ stats.total_revisions }}</div>
+            <div class="text-sm" style="color: var(--text-secondary);">Révisions</div>
+        </div>
+
+        <div class="text-center">
+            <div class="text-4xl font-bold mb-1" style="color: var(--accent);">{{ stats.questions_reussies }}</div>
+            <div class="text-sm" style="color: var(--text-secondary);">Réussies</div>
+        </div>
+
+        <div class="text-center">
+            <div class="text-4xl font-bold mb-1" style="color: var(--accent);">{{ stats.taux_reussite }}%</div>
+            <div class="text-sm" style="color: var(--text-secondary);">Taux</div>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+<!-- CTA -->
+{% if not user.is_authenticated %}
+<div class="glass rounded-2xl p-12 text-center">
+    <h2 class="text-3xl font-bold mb-4" style="color: var(--text-primary);">Prêt à commencer ?</h2>
+    <p class="text-lg mb-8" style="color: var(--text-secondary);">Rejoins des milliers d'élèves qui améliorent leurs résultats</p>
+    <a href="{% url 'accounts:signup' %}" class="inline-block px-8 py-4 rounded-xl text-white font-medium transition hover:opacity-90" style="background: var(--accent);">
+        Créer mon compte gratuitement
+    </a>
+</div>
+{% endif %}
+{% endblock %}

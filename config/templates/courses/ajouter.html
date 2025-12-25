@@ -1,0 +1,160 @@
+{% extends 'base.html' %}
+
+{% block title %}Ajouter un cours - FocusStudy{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto">
+    <div class="glass rounded-2xl p-8">
+        <div class="text-center mb-8">
+            <div class="w-16 h-16 rounded-2xl mx-auto flex items-center justify-center mb-4" style="background: var(--accent); opacity: 0.1;">
+                <i class="fas fa-plus-circle text-3xl" style="color: var(--accent);"></i>
+            </div>
+            <h1 class="text-3xl font-bold mb-2" style="color: var(--text-primary);">Nouveau cours</h1>
+            <p class="text-sm" style="color: var(--text-secondary);">L'IA va créer automatiquement ton support de révision</p>
+        </div>
+
+        <!-- Onglets -->
+        <div class="flex gap-2 mb-6" style="border-bottom: 1px solid var(--border-color);">
+            <button onclick="changeTab('manuel')" id="tab-manuel" class="px-4 py-3 text-sm font-medium transition" style="border-bottom: 2px solid var(--accent); color: var(--accent);">
+                Saisie manuelle
+            </button>
+            <button onclick="changeTab('photo')" id="tab-photo" class="px-4 py-3 text-sm font-medium transition" style="color: var(--text-secondary);">
+                Photo
+            </button>
+            <button onclick="changeTab('copie')" id="tab-copie" class="px-4 py-3 text-sm font-medium transition" style="color: var(--text-secondary);">
+                Copier-coller
+            </button>
+        </div>
+
+        <form method="post" enctype="multipart/form-data" class="space-y-5">
+            {% csrf_token %}
+
+            <input type="hidden" name="type_saisie" id="type_saisie" value="manuel">
+
+            <div>
+                <label class="block text-sm font-medium mb-2" style="color: var(--text-primary);">Titre du cours *</label>
+                <input
+                    type="text"
+                    name="titre"
+                    required
+                    placeholder="Ex: Les équations du second degré"
+                    class="glass w-full px-4 py-3 rounded-xl text-sm focus:outline-none focus:ring-2 transition"
+                    style="color: var(--text-primary); --tw-ring-color: var(--accent);"
+                >
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-sm font-medium mb-2" style="color: var(--text-primary);">Matière</label>
+                    <select
+                        name="matiere"
+                        class="glass w-full px-4 py-3 rounded-xl text-sm focus:outline-none focus:ring-2 transition"
+                        style="color: var(--text-primary); --tw-ring-color: var(--accent);"
+                    >
+                        <option value="">Choisir</option>
+                        {% for matiere in matieres %}
+                            <option value="{{ matiere.id }}">{{ matiere.icone }} {{ matiere.nom }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-medium mb-2" style="color: var(--text-primary);">Chapitre</label>
+                    <input
+                        type="text"
+                        name="chapitre"
+                        placeholder="Ex: Chapitre 3"
+                        class="glass w-full px-4 py-3 rounded-xl text-sm focus:outline-none focus:ring-2 transition"
+                        style="color: var(--text-primary); --tw-ring-color: var(--accent);"
+                    >
+                </div>
+            </div>
+
+            <!-- Zone saisie manuelle -->
+            <div id="zone-manuel">
+                <label class="block text-sm font-medium mb-2" style="color: var(--text-primary);">Contenu du cours *</label>
+                <textarea
+                    name="contenu_original"
+                    rows="12"
+                    required
+                    placeholder="Saisis ton cours ici... L'IA va le transformer !"
+                    class="glass w-full px-4 py-3 rounded-xl text-sm focus:outline-none focus:ring-2 transition resize-none"
+                    style="color: var(--text-primary); --tw-ring-color: var(--accent);"
+                ></textarea>
+                <p class="text-xs mt-2" style="color: var(--text-secondary);">
+                    <i class="fas fa-magic mr-1"></i>Résumé, fiche et questions générés automatiquement
+                </p>
+            </div>
+
+            <!-- Zone photo -->
+            <div id="zone-photo" class="hidden">
+                <label class="block text-sm font-medium mb-2" style="color: var(--text-primary);">Photo de ton cours</label>
+                <div class="glass rounded-xl p-8 text-center" style="border: 2px dashed var(--border-color);">
+                    <input type="file" name="photo_cours" id="photo_cours" accept="image/*" class="hidden" onchange="previewPhoto(event)">
+                    <label for="photo_cours" class="cursor-pointer">
+                        <div id="photo-preview">
+                            <i class="fas fa-cloud-upload-alt text-5xl mb-3" style="color: var(--text-secondary);"></i>
+                            <p class="text-sm mb-1" style="color: var(--text-primary);">Clique pour choisir une photo</p>
+                            <p class="text-xs" style="color: var(--text-secondary);">PNG, JPG jusqu'à 10MB</p>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Zone copier-coller -->
+            <div id="zone-copie" class="hidden">
+                <label class="block text-sm font-medium mb-2" style="color: var(--text-primary);">Colle ton cours ici</label>
+                <textarea
+                    name="contenu_original_copie"
+                    rows="12"
+                    placeholder="Colle le texte ici..."
+                    class="glass w-full px-4 py-3 rounded-xl text-sm focus:outline-none focus:ring-2 transition resize-none"
+                    style="color: var(--text-primary); --tw-ring-color: var(--accent);"
+                ></textarea>
+            </div>
+
+            <div class="flex gap-3">
+                <button
+                    type="submit"
+                    class="flex-1 py-3 rounded-xl text-white font-medium transition hover:opacity-90"
+                    style="background: var(--accent);"
+                >
+                    <i class="fas fa-magic mr-2"></i>Traiter avec l'IA
+                </button>
+
+                <a href="{% url 'courses:liste' %}" class="glass px-6 py-3 rounded-xl font-medium transition hover:opacity-80" style="color: var(--text-primary);">
+                    Annuler
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function changeTab(tab) {
+        ['manuel', 'photo', 'copie'].forEach(t => {
+            document.getElementById('tab-' + t).style.borderBottom = 'none';
+            document.getElementById('tab-' + t).style.color = 'var(--text-secondary)';
+            document.getElementById('zone-' + t).classList.add('hidden');
+        });
+
+        document.getElementById('tab-' + tab).style.borderBottom = '2px solid var(--accent)';
+        document.getElementById('tab-' + tab).style.color = 'var(--accent)';
+        document.getElementById('zone-' + tab).classList.remove('hidden');
+        document.getElementById('type_saisie').value = tab;
+    }
+
+    function previewPhoto(event) {
+        const preview = document.getElementById('photo-preview');
+        const file = event.target.files[0];
+
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                preview.innerHTML = `<img src="${e.target.result}" class="max-h-64 mx-auto rounded-xl">`;
+            }
+            reader.readAsDataURL(file);
+        }
+    }
+</script>
+{% endblock %}

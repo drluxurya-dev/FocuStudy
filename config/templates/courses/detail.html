@@ -1,0 +1,184 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ cours.titre }} - FocusStudy{% endblock %}
+
+{% block content %}
+<div class="max-w-5xl mx-auto">
+    <!-- En-tête -->
+    <div class="glass rounded-2xl p-6 mb-6">
+        <div class="flex justify-between items-start mb-4">
+            <div class="flex-1">
+                <div class="flex flex-wrap gap-2 mb-3">
+                    <span class="text-xs font-medium px-3 py-1 rounded-full" style="background: var(--accent); opacity: 0.2; color: var(--accent);">
+                        {{ cours.matiere.icone }} {{ cours.matiere.nom|default:"Autre" }}
+                    </span>
+
+                    {% if cours.statut == 'traite' %}
+                        <span class="text-xs font-medium px-3 py-1 rounded-full bg-green-500 bg-opacity-20 text-green-500">
+                            <i class="fas fa-check-circle mr-1"></i>Traité
+                        </span>
+                    {% elif cours.statut == 'en_traitement' %}
+                        <span class="text-xs font-medium px-3 py-1 rounded-full" style="background: var(--accent); opacity: 0.2; color: var(--accent);">
+                            <i class="fas fa-spinner fa-spin mr-1"></i>En cours
+                        </span>
+                    {% endif %}
+                </div>
+
+                <h1 class="text-3xl font-bold mb-2" style="color: var(--text-primary);">{{ cours.titre }}</h1>
+
+                <div class="flex flex-wrap gap-4 text-sm" style="color: var(--text-secondary);">
+                    {% if cours.chapitre %}
+                        <span>{{ cours.chapitre }}</span>
+                    {% endif %}
+                    <span>{{ cours.date_ajout|date:"d/m/Y" }}</span>
+                    <span>{{ cours.nombre_revisions }} révision{{ cours.nombre_revisions|pluralize }}</span>
+                </div>
+            </div>
+
+            <div class="flex gap-2">
+                <button class="p-2 rounded-lg hover:opacity-70 transition" style="background: var(--bg-secondary);">
+                    <i class="fas fa-star" style="color: var(--text-primary);"></i>
+                </button>
+                <a href="{% url 'courses:modifier' cours.id %}" class="p-2 rounded-lg hover:opacity-70 transition" style="background: var(--bg-secondary);">
+                    <i class="fas fa-edit" style="color: var(--text-primary);"></i>
+                </a>
+                <a href="{% url 'courses:supprimer' cours.id %}" class="p-2 rounded-lg hover:opacity-70 transition" style="background: var(--bg-secondary);">
+                    <i class="fas fa-trash" style="color: var(--text-primary);"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Onglets -->
+    <div class="glass rounded-2xl mb-6">
+        <div class="flex gap-2 p-2" style="border-bottom: 1px solid var(--border-color);">
+            <button onclick="showTab('original')" id="tab-original" class="px-4 py-2 text-sm font-medium rounded-lg transition" style="background: var(--accent); opacity: 0.2; color: var(--accent);">
+                Original
+            </button>
+            <button onclick="showTab('traite')" id="tab-traite" class="px-4 py-2 text-sm font-medium rounded-lg transition hover:opacity-70" style="color: var(--text-secondary);">
+                Cours traité
+            </button>
+            <button onclick="showTab('resume')" id="tab-resume" class="px-4 py-2 text-sm font-medium rounded-lg transition hover:opacity-70" style="color: var(--text-secondary);">
+                Résumé
+            </button>
+            <button onclick="showTab('fiche')" id="tab-fiche" class="px-4 py-2 text-sm font-medium rounded-lg transition hover:opacity-70" style="color: var(--text-secondary);">
+                Fiche
+            </button>
+            <button onclick="showTab('exercices')" id="tab-exercices" class="px-4 py-2 text-sm font-medium rounded-lg transition hover:opacity-70" style="color: var(--text-secondary);">
+                Exercices
+            </button>
+        </div>
+
+        <div class="p-6">
+            <!-- Contenu original -->
+            <div id="content-original">
+                {% if cours.photo_cours %}
+                    <div class="mb-6">
+                        <img src="{{ cours.photo_cours.url }}" alt="Photo" class="max-w-full rounded-xl">
+                    </div>
+                {% endif %}
+
+                <div class="whitespace-pre-wrap" style="color: var(--text-primary);">
+                    {{ cours.contenu_original }}
+                </div>
+            </div>
+
+            <!-- Cours traité -->
+            <div id="content-traite" class="hidden">
+                {% if cours.contenu_traite %}
+                    <div class="whitespace-pre-wrap" style="color: var(--text-primary);">
+                        {{ cours.contenu_traite }}
+                    </div>
+                {% else %}
+                    <div class="text-center py-12">
+                        <i class="fas fa-robot text-5xl mb-3" style="color: var(--text-secondary);"></i>
+                        <h3 class="text-lg font-bold mb-2" style="color: var(--text-primary);">Pas encore traité</h3>
+                        <p class="text-sm mb-4" style="color: var(--text-secondary);">Clique pour traiter avec l'IA</p>
+                        <button class="px-6 py-3 rounded-xl text-white font-medium transition hover:opacity-90" style="background: var(--accent);">
+                            <i class="fas fa-magic mr-2"></i>Traiter maintenant
+                        </button>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Résumé -->
+            <div id="content-resume" class="hidden">
+                {% if cours.resume %}
+                    <div class="whitespace-pre-wrap" style="color: var(--text-primary);">
+                        {{ cours.resume }}
+                    </div>
+                {% else %}
+                    <div class="text-center py-12">
+                        <i class="fas fa-file-alt text-5xl mb-3" style="color: var(--text-secondary);"></i>
+                        <p class="text-sm" style="color: var(--text-secondary);">Résumé généré après traitement</p>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Fiche -->
+            <div id="content-fiche" class="hidden">
+                {% if cours.fiche_revision %}
+                    <div class="whitespace-pre-wrap" style="color: var(--text-primary);">
+                        {{ cours.fiche_revision }}
+                    </div>
+                {% else %}
+                    <div class="text-center py-12">
+                        <i class="fas fa-clipboard-list text-5xl mb-3" style="color: var(--text-secondary);"></i>
+                        <p class="text-sm" style="color: var(--text-secondary);">Fiche générée après traitement</p>
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Exercices -->
+            <div id="content-exercices" class="hidden">
+                {% if cours.exemples %}
+                    <div class="whitespace-pre-wrap" style="color: var(--text-primary);">
+                        {{ cours.exemples }}
+                    </div>
+                {% else %}
+                    <div class="text-center py-12">
+                        <i class="fas fa-pencil-alt text-5xl mb-3" style="color: var(--text-secondary);"></i>
+                        <p class="text-sm" style="color: var(--text-secondary);">Exercices générés après traitement</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Actions -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <button class="glass rounded-xl p-5 bento-card text-center">
+            <i class="fas fa-question-circle text-3xl mb-2" style="color: var(--accent);"></i>
+            <h3 class="font-semibold mb-1" style="color: var(--text-primary);">Quiz</h3>
+            <p class="text-xs" style="color: var(--text-secondary);">Teste tes connaissances</p>
+        </button>
+
+        <button class="glass rounded-xl p-5 bento-card text-center">
+            <i class="fas fa-download text-3xl mb-2" style="color: var(--accent);"></i>
+            <h3 class="font-semibold mb-1" style="color: var(--text-primary);">PDF</h3>
+            <p class="text-xs" style="color: var(--text-secondary);">Télécharger</p>
+        </button>
+
+        <button class="glass rounded-xl p-5 bento-card text-center">
+            <i class="fas fa-share-alt text-3xl mb-2" style="color: var(--accent);"></i>
+            <h3 class="font-semibold mb-1" style="color: var(--text-primary);">Partager</h3>
+            <p class="text-xs" style="color: var(--text-secondary);">Avec tes amis</p>
+        </button>
+    </div>
+</div>
+
+<script>
+    function showTab(tab) {
+        ['original', 'traite', 'resume', 'fiche', 'exercices'].forEach(t => {
+            document.getElementById('tab-' + t).style.background = 'transparent';
+            document.getElementById('tab-' + t).style.color = 'var(--text-secondary)';
+            document.getElementById('content-' + t).classList.add('hidden');
+        });
+
+        document.getElementById('tab-' + tab).style.background = 'var(--accent)';
+        document.getElementById('tab-' + tab).style.opacity = '0.2';
+        document.getElementById('tab-' + tab).style.color = 'var(--accent)';
+        document.getElementById('content-' + tab).classList.remove('hidden');
+    }
+</script>
+{% endblock %}
