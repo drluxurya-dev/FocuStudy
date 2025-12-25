@@ -1,18 +1,21 @@
 # config/settings.py
 from pathlib import Path
 
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
+# Base directory
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-votre-cle-secrete-a-changer'
+# =====================
+# CONFIG SIMPLE
+# =====================
 
-# SECURITY WARNING: don't run with debug turned on in production!
+SECRET_KEY = 'django-insecure-focustudy-simple-key'
 DEBUG = True
+ALLOWED_HOSTS = ['*']
 
-ALLOWED_HOSTS = []
+# =====================
+# APPLICATIONS
+# =====================
 
-# Application definition
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -21,10 +24,14 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
-    # Applications locales
+    # Apps locales
     'accounts',
     'courses',
 ]
+
+# =====================
+# MIDDLEWARE
+# =====================
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -35,6 +42,10 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+# =====================
+# URLS / TEMPLATES
+# =====================
 
 ROOT_URLCONF = 'config.urls'
 
@@ -56,7 +67,10 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'config.wsgi.application'
 
-# Database
+# =====================
+# DATABASE
+# =====================
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -64,42 +78,46 @@ DATABASES = {
     }
 }
 
-# Password validation
+# =====================
+# PASSWORD VALIDATION
+# =====================
+
 AUTH_PASSWORD_VALIDATORS = [
-    {
-        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
-    },
-    {
-        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
-    },
+    {'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator'},
+    {'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator'},
 ]
 
-# Internationalization
+# =====================
+# INTERNATIONALIZATION
+# =====================
+
 LANGUAGE_CODE = 'fr-fr'
 TIME_ZONE = 'Africa/Lome'
 USE_I18N = True
 USE_TZ = True
 
-# Static files (CSS, JavaScript, Images)
+# =====================
+# STATIC & MEDIA
+# =====================
+
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 
-# Media files (Uploads)
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
-# Default primary key field type
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+# =====================
+# DEFAULTS
+# =====================
 
-# Modèle utilisateur personnalisé
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'accounts.User'
 
-# Clé API Google Gemini
-GEMINI_API_KEY = 'AIzaSyC16bMybemIY05_tB7JMVaeiyv1uzmA6VQ'  # À remplacer par ta vraie clé
+# =====================
+# API
+# =====================
+
+GEMINI_API_KEY = 'AIzaSyC16bMybemIY05_tB7JMVaeiyv1uzmA6VQ'
